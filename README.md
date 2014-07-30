@@ -1,7 +1,7 @@
 sendmail
 ========
 
-Setup your mail service like mailgun in one minute, support: smtp/mailgun-http. 
+Setup your mail service like mailgun in one minute at anywhere(home/office/datacenter/cloud/vps), support: smtp/mailgun-http. 
 
 ## Requirement
 
@@ -35,7 +35,6 @@ interval time to check if public ip is changed and update it automatically, just
 
 
 The dnspod api is called over https, dont worry about your password leak.
-
 
 This docker will setup a MTA service, and set TXT domain record in dnspod.cn automatically.
 
