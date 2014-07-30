@@ -66,6 +66,7 @@ $domlist = curl_get($domain_list_url, $data_domlist);
 $domlist || die ("failed to get domain list.");
 $domlist_arr = json_decode($domlist, true);
 if (!$domlist_arr or $domlist_arr['status']['code'] != 1)
+  echo "errmsg:" . $domlist_arr['status']['message'] . "\n";
   die("error when parse the domain list return value.");
 $domain_id = null;
 foreach ($domlist_arr["domains"] as $d) {
@@ -92,6 +93,7 @@ $reclist = curl_get($record_list_url, $data_reclist);
 $reclist || die ("failed to get record list for domain $base_domain");
 $reclist_arr = json_decode($reclist, true);
 if (!$reclist_arr or $reclist_arr['status']['code'] != 1)
+  echo "errmsg:" . $reclist_arr['status']['message'] . "\n";
   die("error when parse the record list return value.");
 
 echo "OK\n";
@@ -129,6 +131,7 @@ if (!$record_id) {
   $rc_result || die ("failed to create txt record for domain $mail_domain.");
   $rcr_arr = json_decode($rc_result, true);
   if (!$rcr_arr or $rcr_arr['status']['code'] != 1)
+    echo "errmsg:" . $rcr_arr['status']['message'] . "\n";
     die ("error when parse the record create return value");
   echo "OK\n";
   $record_id = $rcr_arr['record']['id'];
@@ -157,6 +160,7 @@ while ( true ) {
   $ri_result || pdie("failed to get record info for id $record_id of sub_domain $sub_domain.");
   $rir_arr = json_decode($ri_result, true);
   if (!$rir_arr or $rir_arr['status']['code'] != 1)
+    echo "errmsg:" . $rir_arr['status']['message'] . "\n";
     pdie ("error when parse the record info return value");
   $record_value = $rir_arr['record']['value'];
 
@@ -183,6 +187,7 @@ while ( true ) {
   $rm_result || pdie("failed to modify txt record for domain $mail_domain.");
   $rmr_arr = json_decode($rm_result, true);
   if (!$rmr_arr or $rmr_arr['status']['code'] != 1)
+    echo "errmsg:" . $rmr_arr['status']['message'] . "\n";
     pdie ("error when parse the record modify return value");
   echo "OK\n";
 }
