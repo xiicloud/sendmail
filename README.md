@@ -17,15 +17,29 @@ docker build -t nicescale/sendmail .
 docker run -d --name mta -e MAIL_DOMAIN=mail.example -e DP_USER=xx@example.com -e DP_PASS=123456 nicescale/sendmail
 ```
 
-MAIL_DOMAIN is your mail domain for sendmail service.If sender is noreply@mail.nicescale.com, then you should set MAIL_DOMAIN=mail.nicescale.com
+- MAIL_DOMAIN
 
-DP_USER is your login user of dnspod.cn
+your mail domain for sendmail service. if sender is noreply@mail.nicescale.com, then you should set MAIL_DOMAIN=mail.nicescale.com
 
-DP_PASS is your login password of dnspod.cn
+- DP_USER
+
+your login user of dnspod.cn
+
+- DP_PASS
+
+your login password of dnspod.cn
+
+- CHECK_INTERVAL
+
+interval time to check if public ip is changed and update it automatically, just ddns function. if set to 0, then no check.
+
 
 The dnspod api is called over https, dont worry about your password leak.
 
-This docker will setup a MTA service, and set TXT domain record in dnspod.cn automatically.Further more, we will support dkim/tls/http.
+
+This docker will setup a MTA service, and set TXT domain record in dnspod.cn automatically.
+
+Further more, we will support dkim/tls/http.
 
 ## Usage
 

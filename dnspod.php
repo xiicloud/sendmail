@@ -141,9 +141,9 @@ if (!$record_id) {
   echo "you can run 'dig txt $mail_domain' to verify in linux shell.";
 } 
 
+$interval != 0 && echo "begin while loop ...\n";
 
-echo "begin while loop ...\n";
-while ( true ) {
+while ( $interval != 0 ) {
   sleep($interval);
   echo "get public ip ... ";
   $localip = get_ip();
@@ -195,4 +195,8 @@ while ( true ) {
     pdie ("error when parse the record modify return value");
   }
   echo "OK\n";
+}
+
+while ( true ) {
+  sleep(1000000000000000000000000000000000);
 }
