@@ -1,24 +1,31 @@
 sendmail
 ========
 
-setup your own send mail service in one minute, support: mail command/mail function/mailgun http. 
+Setup your mail service like mailgun in one minute, support: smtp/mailgun-http. 
 
 ## Requirement
 
 You should own dnspod account and add one top-level domain in dnspod. http://dnspod.cn
+
+## Build
+```
+docker build -t nicescale/sendmail .
+```
 
 ## RUN
 ```
 docker run -d --name mta -e MAIL_DOMAIN=mail.example -e DP_USER=xx@example.com -e DP_PASS=123456 nicescale/sendmail
 ```
 
-MAIL_DOMAIN is your mail domain for sendmail service.
+MAIL_DOMAIN is your mail domain for sendmail service.If sender is noreply@mail.nicescale.com, then you should set MAIL_DOMAIN=mail.nicescale.com
 
 DP_USER is your login user of dnspod.cn
 
 DP_PASS is your login password of dnspod.cn
 
-This docker will setup a MTA service, and set TXT domain record in dnspod.cn.
+The dnspod api is called over https, dont worry about your password leak.
+
+This docker will setup a MTA service, and set TXT domain record in dnspod.cn automatically.Further more, we will support dkim/tls/http.
 
 ## Usage
 
@@ -26,9 +33,11 @@ Configure smtp host and port(25) in your runtime, then you can sendmail through 
 ```
 docker run -d mta:mta nicescale/apache_php
 ```
-then you can get MTA related environments in your php.
+then you can get smtp host/port from mta environments in your php.
 
 ## Roadmap
 
-- support dkim
+- support dkim signature
 - support http api of mailgun
+- support tls smtp (587 port)
+
