@@ -3,7 +3,7 @@
 <?php
 $mail_domain = getenv("MAIL_DOMAIN");
 $dp_user = getenv("DP_USER");
-$dp_pass = getenv("DP_USER");
+$dp_pass = getenv("DP_PASS");
 $interval = getenv("CHECK_INTERVAL");
 if($interval == null) $interval = 550;
 
@@ -40,7 +40,7 @@ function get_ip() {
   return $ip;
 }
 
-function curl_get($url, $data) {
+function curl_post($url, $data) {
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $url);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -62,12 +62,13 @@ $data_domlist = array (
 'login_email'=>$dp_user,
 'login_password'=>$dp_pass,
 "format"=>"json" );
-$domlist = curl_get($domain_list_url, $data_domlist);
+$domlist = curl_post($domain_list_url, $data_domlist);
 $domlist || die ("failed to get domain list.");
 $domlist_arr = json_decode($domlist, true);
-if (!$domlist_arr or $domlist_arr['status']['code'] != 1)
+if (!$domlist_arr or $domlist_arr['status']['code'] != 1) {
   echo "errmsg:" . $domlist_arr['status']['message'] . "\n";
   die("error when parse the domain list return value.");
+}
 $domain_id = null;
 foreach ($domlist_arr["domains"] as $d) {
   if($d['name'] == $base_domain) {
@@ -89,12 +90,13 @@ $data_reclist = array (
 'login_password'=>$dp_pass,
 "format"=>"json",
 'domain_id'=>$domain_id );
-$reclist = curl_get($record_list_url, $data_reclist);
+$reclist = curl_post($record_list_url, $data_reclist);
 $reclist || die ("failed to get record list for domain $base_domain");
 $reclist_arr = json_decode($reclist, true);
-if (!$reclist_arr or $reclist_arr['status']['code'] != 1)
+if (!$reclist_arr or $reclist_arr['status']['code'] != 1) {
   echo "errmsg:" . $reclist_arr['status']['message'] . "\n";
   die("error when parse the record list return value.");
+}
 
 echo "OK\n";
 
@@ -127,12 +129,13 @@ if (!$record_id) {
   'record_type'=>'TXT',
   'record_line'=>"默认",
   'value'=>$txtvalue );
-  $rc_result= curl_get($record_create_url, $data_record_create);
+  $rc_result= curl_post($record_create_url, $data_record_create);
   $rc_result || die ("failed to create txt record for domain $mail_domain.");
   $rcr_arr = json_decode($rc_result, true);
-  if (!$rcr_arr or $rcr_arr['status']['code'] != 1)
+  if (!$rcr_arr or $rcr_arr['status']['code'] != 1) {
     echo "errmsg:" . $rcr_arr['status']['message'] . "\n";
     die ("error when parse the record create return value");
+  }
   echo "OK\n";
   $record_id = $rcr_arr['record']['id'];
   echo "you can run 'dig txt $mail_domain' to verify in linux shell.";
@@ -156,12 +159,13 @@ while ( true ) {
   'domain_id'=>$domain_id,
   'record_id'=>$record_id
   );
-  $ri_result=curl_get($record_info_url, $data_record_info);
+  $ri_result=curl_post($record_info_url, $data_record_info);
   $ri_result || pdie("failed to get record info for id $record_id of sub_domain $sub_domain.");
   $rir_arr = json_decode($ri_result, true);
-  if (!$rir_arr or $rir_arr['status']['code'] != 1)
+  if (!$rir_arr or $rir_arr['status']['code'] != 1) {
     echo "errmsg:" . $rir_arr['status']['message'] . "\n";
     pdie ("error when parse the record info return value");
+  }
   $record_value = $rir_arr['record']['value'];
 
   // if record value contains local ip , then continue,not modify
@@ -183,11 +187,12 @@ while ( true ) {
   'record_type'=>'TXT',
   'record_line'=>"默认"
   );
-  $rm_result = curl_get($record_modify_url, $data_record_modify);
+  $rm_result = curl_post($record_modify_url, $data_record_modify);
   $rm_result || pdie("failed to modify txt record for domain $mail_domain.");
   $rmr_arr = json_decode($rm_result, true);
-  if (!$rmr_arr or $rmr_arr['status']['code'] != 1)
+  if (!$rmr_arr or $rmr_arr['status']['code'] != 1) {
     echo "errmsg:" . $rmr_arr['status']['message'] . "\n";
     pdie ("error when parse the record modify return value");
+  }
   echo "OK\n";
 }
