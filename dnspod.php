@@ -141,7 +141,7 @@ if (!$record_id) {
   echo "you can run 'dig txt $mail_domain' to verify in linux shell.";
 } 
 
-$interval != 0 && echo "begin while loop ...\n";
+if ($interval != 0) echo "begin while loop ...\n";
 
 while ( $interval != 0 ) {
   sleep($interval);
