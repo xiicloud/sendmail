@@ -104,7 +104,7 @@ $record_id = null;
 $record_value = null;
 $dkim_record_id = null;
 $dkim_public = file_get_contents("/opt/nicedocker/dkim.public");
-$dkim_selector = file_get_contents("/opt/nicedocker/dkim.selector");
+$dkim_selector = trim(file_get_contents("/opt/nicedocker/dkim.selector"));
 foreach ($reclist_arr['records'] as $r) {
   if ($r['name'] == $sub_domain && $r['type'] == 'TXT') {
     $record_id = $r['id']; 
@@ -144,7 +144,7 @@ if (!$record_id) {
   }
   echo "OK\n";
   $record_id = $rcr_arr['record']['id'];
-  echo "you can run 'dig txt $mail_domain' to verify in linux shell.";
+  echo "you can run 'dig txt $mail_domain' to verify in linux shell.\n";
 } 
 
 if (!$dkim_record_id) {
@@ -169,7 +169,7 @@ if (!$dkim_record_id) {
   }
   echo "OK\n";
   $dkim_record_id = $drcr_arr['record']['id'];
-  echo "you can run 'dig txt $dkim_selector._domainkey.$mail_domain' to verify in linux shell.";
+  echo "you can run 'dig txt $dkim_selector._domainkey.$mail_domain' to verify in linux shell.\n";
 } else {
   if ($dkim_record_value != $dkim_public) {
     $dkim_record_modify_url = "https://dnsapi.cn/Record.Modify";
@@ -194,8 +194,12 @@ if (!$dkim_record_id) {
   }
 }
 
+echo "now you own a dedicated sendmail service, and support dkim/vspf.
+enjoy our sendmail docker!
+Good luck!!\n\n";
 
-if ($interval != 0) echo "begin while loop ...\n";
+if ($interval != 0) 
+  echo "begin while loop to update dns dynamic ...\nyou can set CHECK_INTERVAL=0 to close ddns function.\n";
 
 while ( $interval != 0 ) {
   sleep($interval);

@@ -4,6 +4,27 @@ set -e
 
 envfile=${CONF_DIR-:/opt/nicedocker/conf}/env
 
+function gen_dkim() {
+  SELECTOR=`cat /dev/urandom | tr -dc 'a-z' | fold -w 4 | head -n 1`
+  cd /etc/exim4
+  openssl genrsa -out dkim.private.$SELECTOR 1024
+  openssl rsa -in dkim.private.$SELECTOR -out dkim.public.der -pubout -outform DER
+  base64 < dkim.public.der > dkim.public.$SELECTOR
+  rm dkim.public.der
+  chown root:Debian-exim dkim.private.$SELECTOR
+  chmod 440 dkim.private.$SELECTOR
+  echo $SELECTOR > /opt/nicedocker/dkim.selector
+  cat dkim.public.$SELECTOR > /opt/nicedocker/dkim.public
+
+  cat <<EOF > /etc/exim4/conf.d/main/00_exim4-config_localmacros
+DKIM_CANON = relaxed
+DKIM_DOMAIN = $MAIL_DOMAIN
+DKIM_PRIVATE_KEY = /etc/exim4/dkim.private.$SELECTOR
+DKIM_SELECTOR = $SELECTOR
+EOF
+
+}
+
 [ -f $envfile ] &&
 . $envfile &&
 eval `cat $envfile|grep -v ^#|grep '='|cut -f1 -d'='|xargs echo export`
@@ -13,24 +34,12 @@ if [ -z "$MAIL_DOMAIN" -o -z "$DP_USER" -o -z "$DP_PASS" ]; then
   exit 1
 fi
 
-if [ ! -e /opt/nicedocker/dkim.public ]; then
+if [ ! -e /opt/nicedocker/dkim.public -o ! -e /opt/nicedocker/dkim.selector]; then
   gen_dkim
 fi
 
 service exim4 start
 service nginx start
 
-php dnspod.php
+exec php /opt/nicedocker/dnspod.php
 
-function gen_dkim() {
-  SELECTOR=`cat /dev/urandom | tr -dc 'a-z' | fold -w 4 | head -n 1`
-  cd /etc/exim4
-  openssl genrsa -out dkim.private.$SELECTOR 1024
-  openssl rsa -in dkim.private.$SELECTOR -out dkim.public.der -pubout -outform DER
-  base64 < dkim.public.der > dkim.public.$SELECTOR 
-  rm dkim.public.der
-  chown root:Debian-exim dkim.private.$SELECTOR
-  chmod 440 dkim.private.$SELECTOR
-  echo $SELECTOR > /opt/nicedocker/dkim.selector
-  cat dkim.public.$SELECTOR > /opt/nicedocker/dkim.public
-}
