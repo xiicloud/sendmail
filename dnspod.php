@@ -102,11 +102,17 @@ echo "OK\n";
 
 $record_id = null;
 $record_value = null;
+$dkim_record_id = null;
+$dkim_public = file_get_contents("/opt/nicedocker/dkim.public");
+$dkim_selector = file_get_contents("/opt/nicedocker/dkim.selector");
 foreach ($reclist_arr['records'] as $r) {
   if ($r['name'] == $sub_domain && $r['type'] == 'TXT') {
     $record_id = $r['id']; 
     $record_value = $r['value'];
-    break;
+  }
+  if ($r['name'] == $dkim_selector."._domainkey" && $r['type'] == 'TXT') {
+    $dkim_record_id = $r['id'];
+    $dkim_record_value = $r['value'];
   }
 }
 
@@ -140,6 +146,54 @@ if (!$record_id) {
   $record_id = $rcr_arr['record']['id'];
   echo "you can run 'dig txt $mail_domain' to verify in linux shell.";
 } 
+
+if (!$dkim_record_id) {
+  echo "record $dkim_selector._domainkey type txt not existed yet.\n";
+  echo "create record $dkim_selector._domainkey type txt ... ";
+  $dkim_record_create_url = 'https://dnsapi.cn/Record.Create';
+  $dkim_data_record_create = array (
+  'login_email'=>$dp_user,
+  'login_password'=>$dp_pass,
+  "format"=>"json",
+  'domain_id'=>$domain_id,
+  'sub_domain'=>$dkim_selector."._domainkey",
+  'record_type'=>'TXT',
+  'record_line'=>"默认",
+  'value'=>$dkim_public );
+  $drc_result= curl_post($dkim_record_create_url, $dkim_data_record_create);
+  $drc_result || die ("failed to create dkim record for domain $mail_domain.");
+  $drcr_arr = json_decode($drc_result, true);
+  if (!$drcr_arr or $drcr_arr['status']['code'] != 1) {
+    echo "errmsg:" . $drcr_arr['status']['message'] . "\n";
+    die ("error when parse the dkim record create return value");
+  }
+  echo "OK\n";
+  $dkim_record_id = $drcr_arr['record']['id'];
+  echo "you can run 'dig txt $dkim_selector._domainkey.$mail_domain' to verify in linux shell.";
+} else {
+  if ($dkim_record_value != $dkim_public) {
+    $dkim_record_modify_url = "https://dnsapi.cn/Record.Modify";
+    $dkim_data_record_modify = array (
+    'login_email'=>$dp_user,
+    'login_password'=>$dp_pass,
+    "format"=>"json",
+    'domain_id'=>$domain_id,
+    'record_id'=>$dkim_record_id,
+    'sub_domain'=>$dkim_selector."._domainkey",
+    'value'=>$dkim_public,
+    'record_type'=>'TXT',
+    'record_line'=>"默认"
+    );
+    $drm_result = curl_post($dkim_record_modify_url, $dkim_data_record_modify);
+    $drm_result || die("failed to modify dkim record for domain $mail_domain.");
+    $drmr_arr = json_decode($drm_result, true);
+    if (!$drmr_arr or $drmr_arr['status']['code'] != 1) {
+      echo "errmsg:" . $drmr_arr['status']['message'] . "\n";
+      pdie ("error when parse the dkim record modify return value");
+    }
+  }
+}
+
 
 if ($interval != 0) echo "begin while loop ...\n";
 
