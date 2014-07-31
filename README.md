@@ -1,7 +1,11 @@
 sendmail
 ========
 
-Setup your mail service like mailgun in one minute at anywhere(home/office/datacenter/cloud/vps), support: smtp/mailgun-http. 
+Setup your mail service like mailgun in one minute at anywhere(home/office/datacenter/cloud/vps).
+
+Programming API: smtp/mailgun-http. 
+
+Support SPF/DKIM
 
 ## Requirement
 
@@ -43,14 +47,15 @@ Further more, we will support dkim/tls/http.
 ## Usage
 
 Configure smtp host and port(25) in your runtime, then you can sendmail through function mail. or:
+
 ```
 docker run -d mta:mta nicescale/apache_php
 ```
+
 then you can get smtp host/port from mta environments in your php.
 
 ## Roadmap
 
-- support dkim signature
 - support http api of mailgun
 - support tls smtp (587 port)
 
