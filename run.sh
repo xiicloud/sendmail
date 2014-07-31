@@ -34,7 +34,7 @@ if [ -z "$MAIL_DOMAIN" -o -z "$DP_USER" -o -z "$DP_PASS" ]; then
   exit 1
 fi
 
-if [ ! -e /opt/nicedocker/dkim.public -o ! -e /opt/nicedocker/dkim.selector]; then
+if [ ! -e /opt/nicedocker/dkim.public -o ! -e /opt/nicedocker/dkim.selector ]; then
   gen_dkim
 fi
 

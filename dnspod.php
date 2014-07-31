@@ -105,6 +105,7 @@ $record_value = null;
 $dkim_record_id = null;
 $dkim_public = file_get_contents("/opt/nicedocker/dkim.public");
 $dkim_selector = trim(file_get_contents("/opt/nicedocker/dkim.selector"));
+$dkim_value = "k=rsa; p=$dkim_public";
 foreach ($reclist_arr['records'] as $r) {
   if ($r['name'] == $sub_domain && $r['type'] == 'TXT') {
     $record_id = $r['id']; 
@@ -156,10 +157,10 @@ if (!$dkim_record_id) {
   'login_password'=>$dp_pass,
   "format"=>"json",
   'domain_id'=>$domain_id,
-  'sub_domain'=>$dkim_selector."._domainkey",
+  'sub_domain'=>$dkim_selector."._domainkey.$sub_domain",
   'record_type'=>'TXT',
   'record_line'=>"默认",
-  'value'=>$dkim_public );
+  'value'=>$dkim_value );
   $drc_result= curl_post($dkim_record_create_url, $dkim_data_record_create);
   $drc_result || die ("failed to create dkim record for domain $mail_domain.");
   $drcr_arr = json_decode($drc_result, true);
@@ -171,7 +172,7 @@ if (!$dkim_record_id) {
   $dkim_record_id = $drcr_arr['record']['id'];
   echo "you can run 'dig txt $dkim_selector._domainkey.$mail_domain' to verify in linux shell.\n";
 } else {
-  if ($dkim_record_value != $dkim_public) {
+  if ($dkim_record_value != $dkim_value) {
     $dkim_record_modify_url = "https://dnsapi.cn/Record.Modify";
     $dkim_data_record_modify = array (
     'login_email'=>$dp_user,
@@ -179,8 +180,8 @@ if (!$dkim_record_id) {
     "format"=>"json",
     'domain_id'=>$domain_id,
     'record_id'=>$dkim_record_id,
-    'sub_domain'=>$dkim_selector."._domainkey",
-    'value'=>$dkim_public,
+    'sub_domain'=>$dkim_selector."._domainkey.$sub_domain",
+    'value'=>$dkim_value,
     'record_type'=>'TXT',
     'record_line'=>"默认"
     );
