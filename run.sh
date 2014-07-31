@@ -27,7 +27,7 @@ EOF
 
 function setup_exim() {
   eximconf=/etc/exim4/update-exim4.conf.conf
-  sed -i -e "s/dc_eximconfig_configtype=.*/dc_eximconfig_configtype=internet/" $eximconf
+  sed -i -e "s/dc_eximconfig_configtype=.*/dc_eximconfig_configtype='internet'/" $eximconf
   sed -i -e "s/dc_other_hostnames=.*/dc_other_hostnames='$MAIL_DOMAIN'" $eximconf
   sed -i -e "s/dc_use_split_config=.*/dc_use_split_config='true'/" $eximconf
 }
