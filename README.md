@@ -18,7 +18,7 @@ docker build -t nicescale/sendmail .
 
 ## RUN
 ```
-docker run -d --name mta -e MAIL_DOMAIN=mail.example -e DP_USER=xx@example.com -e DP_PASS=123456 nicescale/sendmail
+docker run -d --name -h mail.example mta -e MAIL_DOMAIN=mail.example -e DP_USER=xx@example.com -e DP_PASS=123456 nicescale/sendmail
 ```
 
 - MAIL_DOMAIN
