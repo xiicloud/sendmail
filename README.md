@@ -18,7 +18,7 @@ docker build -t nicescale/sendmail .
 
 ## RUN
 ```
-docker run -d --name -h mail.example mta -e MAIL_DOMAIN=mail.example -e DP_USER=xx@example.com -e DP_PASS=123456 nicescale/sendmail
+docker run -d --name mta -h mail.example -e MAIL_DOMAIN=mail.example -e DP_USER=xx@example.com -e DP_PASS=123456 nicescale/sendmail
 ```
 
 - MAIL_DOMAIN
@@ -42,7 +42,7 @@ The dnspod api is called over https, dont worry about your password leak.
 
 This docker will setup a MTA service, and set TXT domain record in dnspod.cn automatically.
 
-Further more, we will support dkim/tls/http.
+Further more, we will support http/tls smtp.
 
 ## Usage
 
@@ -58,4 +58,4 @@ then you can get smtp host/port from mta environments in your php.
 
 - support http api of mailgun
 - support tls smtp (587 port)
-
+- multiple public ips for one domain
