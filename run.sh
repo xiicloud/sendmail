@@ -25,6 +25,13 @@ EOF
 
 }
 
+function setup_exim() {
+  eximconf=/etc/exim4/update-exim4.conf.conf
+  sed -i -e "s/dc_eximconfig_configtype=.*/dc_eximconfig_configtype=internet/" $eximconf
+  sed -i -e "s/dc_other_hostnames=.*/dc_other_hostnames='$MAIL_DOMAIN'" $eximconf
+  sed -i -e "s/dc_use_split_config=.*/dc_use_split_config='true'/" $eximconf
+}
+
 [ -f $envfile ] &&
 . $envfile &&
 eval `cat $envfile|grep -v ^#|grep '='|cut -f1 -d'='|xargs echo export`
@@ -36,10 +43,12 @@ fi
 
 if [ ! -e /opt/nicedocker/dkim.public -o ! -e /opt/nicedocker/dkim.selector ]; then
   gen_dkim
+  setup_exim
+  update-exim4.conf
 fi
 
-service exim4 start
 service nginx start
+service exim4 start
 
 exec php /opt/nicedocker/dnspod.php
 
