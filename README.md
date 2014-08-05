@@ -40,7 +40,7 @@ interval time to check if public ip is changed and update it automatically, just
 
 The dnspod api is called over https, dont worry about your password leak.
 
-This docker will setup a MTA service, and set TXT domain record in dnspod.cn automatically.
+This docker will setup a MTA service, and set TXT domain record of spf/dkim in dnspod.cn automatically.
 
 Further more, we will support http/tls smtp.
 
