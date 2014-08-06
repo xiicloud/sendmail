@@ -106,12 +106,17 @@ $dkim_record_id = null;
 $dkim_public = file_get_contents("/opt/nicedocker/dkim.public");
 $dkim_selector = trim(file_get_contents("/opt/nicedocker/dkim.selector"));
 $dkim_value = "k=rsa; p=$dkim_public";
+if($sub_domain == "@") {
+  $dkim_sub_domain = "$dkim_selector._domainkey";
+} else {
+  $dkim_sub_domain = "$dkim_selector._domainkey.$sub_domain";
+}
 foreach ($reclist_arr['records'] as $r) {
   if ($r['name'] == $sub_domain && $r['type'] == 'TXT') {
     $record_id = $r['id']; 
     $record_value = $r['value'];
   }
-  if ($r['name'] == $dkim_selector."._domainkey" && $r['type'] == 'TXT') {
+  if ($r['name'] == $dkim_sub_domain && $r['type'] == 'TXT') {
     $dkim_record_id = $r['id'];
     $dkim_record_value = $r['value'];
   }
@@ -149,15 +154,15 @@ if (!$record_id) {
 } 
 
 if (!$dkim_record_id) {
-  echo "record $dkim_selector._domainkey type txt not existed yet.\n";
-  echo "create record $dkim_selector._domainkey type txt ... ";
+  echo "record $dkim_sub_domain type txt not existed yet.\n";
+  echo "create record $dkim_sub_domain type txt ... ";
   $dkim_record_create_url = 'https://dnsapi.cn/Record.Create';
   $dkim_data_record_create = array (
   'login_email'=>$dp_user,
   'login_password'=>$dp_pass,
   "format"=>"json",
   'domain_id'=>$domain_id,
-  'sub_domain'=>$dkim_selector."._domainkey.$sub_domain",
+  'sub_domain'=>$dkim_sub_domain,
   'record_type'=>'TXT',
   'record_line'=>"默认",
   'value'=>$dkim_value );
@@ -180,7 +185,7 @@ if (!$dkim_record_id) {
     "format"=>"json",
     'domain_id'=>$domain_id,
     'record_id'=>$dkim_record_id,
-    'sub_domain'=>$dkim_selector."._domainkey.$sub_domain",
+    'sub_domain'=>$dkim_sub_domain,
     'value'=>$dkim_value,
     'record_type'=>'TXT',
     'record_line'=>"默认"

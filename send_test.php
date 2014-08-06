@@ -13,6 +13,7 @@ $mail_domain = getenv("MAIL_DOMAIN");
 $dp_user = getenv("DP_USER");
 
 function mailsend($from, $fromname, $subject, $msg, $to, $cc="", $bcc="") {
+  global $mail;
   $mail->From = $from;
   $mail->FromName = $fromname;
   $mail->addAddress($to);
