@@ -7,9 +7,11 @@ run git clone https://github.com/Synchro/PHPMailer.git /opt/nicedocker/phpmailer
 add . /opt/nicedocker
 workdir /opt/nicedocker
 
-run mkdir /etc/service/dnspod && cp dnspod.sh /etc/service/dnspod/run
+run mkdir /etc/service/dnspod && cp dnspod.php /etc/service/dnspod/run
 run mkdir /etc/service/nginx && cp nginx.sh /etc/service/nginx/run
 run mkdir /etc/service/exim4 && cp exim4.sh /etc/service/exim4/run
+
+run cp mta_prepare.sh /etc/my_init.d/
 
 expose 25 80
 

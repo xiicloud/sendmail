@@ -47,9 +47,3 @@ if [ ! -e /opt/nicedocker/dkim.public -o ! -e /opt/nicedocker/dkim.selector ]; t
   update-exim4.conf
 fi
 
-exim_pid=`ps ax|grep exi[m]`
-if [ -n "$exim_pid" ]; then
-  echo $exim_pid|cut -c1-5|xargs kill
-fi
-
-exec /opt/nicedocker/dnspod.php
