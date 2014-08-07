@@ -5,7 +5,7 @@ set -e
 envfile=${CONF_DIR-:/opt/nicedocker/conf}/env
 
 function gen_dkim() {
-  SELECTOR=`cat /dev/urandom | tr -dc 'a-z' | fold -w 4 | head -n 1`
+  SELECTOR=`dd if=/dev/urandom  bs=100 count=1 2>/dev/null | tr -dc 'a-z' | fold -w 4 | head -n 1`
   cd /etc/exim4
   openssl genrsa -out dkim.private.$SELECTOR 1024
   openssl rsa -in dkim.private.$SELECTOR -out dkim.public.der -pubout -outform DER
